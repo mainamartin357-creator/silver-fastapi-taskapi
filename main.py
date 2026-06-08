@@ -1,18 +1,17 @@
-from fastapi import FastAPI
-from .database import engine, Base
-from .routers import tasks
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+import os
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app = FastAPI(title="Task Management API")
+db = SQLAlchemy(app)
 
-app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
-
-@app.get("/")
-def root():
-    return {"message": "Task Management API is running"}
+# Simple root route
+@app.route("/")
+def home():
+    return {"message": "Task Management API is running (Flask)"}
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=8000, debug=True)
